@@ -103,3 +103,44 @@ Intersection findIntersection (const Ray& ray) const override {
 
     
 }
+
+// class TriangleIndices {
+//     public:
+//         TriangleIndices(int vtxi = -1, int vtxj = -1, int vtxk = -1, int ni = -1, int nj = -1, int nk = -1, int uvi = -1, int uvj = -1, int uvk = -1, int group = -1, bool added = false) : V(vtxi, vtxj, vtxk), UV(uvi, uvj, uvk), N(ni, nj, nk), group(group) {
+//         };
+//         TriangleIndices(const Vector V, const Vector UV, const Vector N, int group = -1) :  V(V), UV(UV), N(N), group(group) {};
+//         Vector V; // vertex coordinates
+//         Vector UV;  // uv coordinates
+//         Vector N;  // normal
+//         int group;  // face group
+// };
+
+// struct AABB {
+//     Vector min, max;
+
+//     bool intersect(const Ray& ray, double& t_min, double& t_max) const {
+//         t_min = 0;
+//         t_max = std::numeric_limits<double>::max();
+//         for (int i = 0; i < 3; i++) {
+//             double invD = 1.0 / ray.u[i];
+//             double t0 = (min[i] - ray.O[i]) * invD;
+//             double t1 = (max[i] - ray.O[i]) * invD;
+//             if (invD < 0.0) std::swap(t0, t1);
+//             t_min = std::max(t_min, t0);
+//             t_max = std::min(t_max, t1);
+//             if (t_max <= t_min) return false;
+//         }
+//         return true;
+//     }
+// };
+
+// struct BVHNode {
+//     AABB box;
+//     BVHNode* left = nullptr;
+//     BVHNode* right = nullptr;
+//     std::vector<int> triangleIndices;
+
+//     bool isLeaf() const {
+//         return left == nullptr && right == nullptr;
+//     }
+// };

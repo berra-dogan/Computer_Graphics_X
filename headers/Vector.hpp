@@ -68,3 +68,19 @@ Vector cross(const Vector& a, const Vector& b) {
 double distance(const Vector& a, const Vector& b) {
     return (a-b).norm();
 }
+
+// Vector matrix_min_elements(const Vector& a, const Vector& b){
+//     return Vector(std::min(a[0], b[0]), std::min(a[1], b[1]), std::min(a[2], b[2]));
+// }
+
+// double matrix_min_element(const Vector& a){
+//     if (a[0]<=a[1] && a[0]<=a[2]) return a[0];
+//     else if (a[1]<=a[2]) return a[1];
+//     return a[2];
+// }
+
+// double matrix_max_element(const Vector& a){
+//     if (a[0]>=a[1] && a[0]>=a[2]) return a[0];
+//     else if (a[1]>=a[2]) return a[1];
+//     return a[2];
+// }
