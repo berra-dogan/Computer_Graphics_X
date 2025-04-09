@@ -172,11 +172,11 @@ int main() {
         std::make_shared<Sphere>(Vector(0, 1000, 0), 940, Vector(0.2, 0.5, 0.9)),  // ceiling
         std::make_shared<Sphere>(Vector(-1000, 0, 0), 940, Vector(0.4, 0.8, 0.7)), // back-wall
         std::make_shared<Sphere>(Vector(1000, 0, 0), 940, Vector(0.9, 0.4, 0.3)),  // wall-behind-camera
-        // std::make_shared<Sphere>(Vector(-18, 0, 0), 8, Vector(0.8, 0.8, 0.8), true), // mirror
-        // std::make_shared<Sphere>(Vector(18, 0, 0), 8, Vector(0.8, 0.8, 0.8), false, true, 1.5), // transparent
-        // std::make_shared<Sphere>(Vector(0, 0, 0), 8, Vector(0, 0, 0), false, true, 1.5),       // hollow-transp 1
-        // std::make_shared<Sphere>(Vector(0, 0, 0), 8 - EPSILON, Vector(0, 0, 0), false, true, 1), // hollow-transp 2
-        std::make_shared<TriangleMesh>(catMesh),
+        std::make_shared<Sphere>(Vector(-18, -2, 0), 8, Vector(0.8, 0.8, 0.8), true), // mirror
+        std::make_shared<Sphere>(Vector(18, -2, 0), 8, Vector(0.8, 0.8, 0.8), false, true, 1.5), // transparent
+        std::make_shared<Sphere>(Vector(0, -2, 0), 8, Vector(0, 0, 0), false, true, 1.5),       // hollow-transp 1
+        std::make_shared<Sphere>(Vector(0, -2, 0), 8 - EPSILON, Vector(0, 0, 0), false, true, 1), // hollow-transp 2
+        //std::make_shared<TriangleMesh>(catMesh),
         //std::make_shared<Sphere>(Vector(0,0,0), 10, Vector(0.8,0.8,0.8)), //trial
     };
 
