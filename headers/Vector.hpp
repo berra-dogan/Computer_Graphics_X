@@ -79,8 +79,8 @@ double distance(const Vector& a, const Vector& b) {
 //     return a[2];
 // }
 
-// double matrix_max_element(const Vector& a){
-//     if (a[0]>=a[1] && a[0]>=a[2]) return a[0];
-//     else if (a[1]>=a[2]) return a[1];
-//     return a[2];
-// }
+int matrix_max_element_dim(const Vector& a){
+    if (a[0]>=a[1] && a[0]>=a[2]) return 0;
+    else if (a[1]>=a[2]) return 1;
+    return 2;
+}
