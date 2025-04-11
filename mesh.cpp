@@ -167,7 +167,7 @@ int main() {
     TriangleMesh catMesh(Vector(1.,1.,1.));
     catMesh.readOBJ("cadnav.com_model/Models_F0202A090/cat.obj");
     catMesh.applyTransform(Vector(0.6, 0.6, 0.6), Vector(0, -10, 0));
-    catMesh.bounding_box = catMesh.compute_bbox(0, catMesh.indices.size());
+    catMesh.bounding_box = catMesh.compute_bbox();
 
     std::vector<std::shared_ptr<Geometry>> objects = {
         std::make_shared<Sphere>(Vector(0, 0, 1000), 940, Vector(0.9, 0.2, 0.9)),  // left-wall

@@ -323,7 +323,7 @@ public:
         }
     }
 
-    BoundingBox compute_bbox() {
+    static BoundingBox compute_bbox(std::vector<Vector> vertices) {
         BoundingBox bounding_box;
         bounding_box.m = Vector(1E9,1E9,1E9);
         bounding_box.M = Vector(-1E9,-1E9,-1E9);
@@ -336,27 +336,96 @@ public:
 
         return bounding_box;
     }
+
+    void update_bbox(std::vector<const TriangleIndices*> triangles, int dim, BoundingBox& bb) const {
+
+        for (const TriangleIndices* triangle : triangles){
+            for (Vector vertex : {vertices[triangle->vtxi], vertices[triangle->vtxj], vertices[triangle->vtxk]}){
+                bb.m[dim] = std::min(bb.m[dim], vertex[dim]);
+                bb.M[dim] = std::max(bb.M[dim], vertex[dim]);
+            }
+        }
+
+    }
+
+    Vector FindBarycenter(const TriangleIndices& triangle) const {
+        Vector A = vertices[triangle.vtxi];
+        Vector B = vertices[triangle.vtxj];
+        Vector C = vertices[triangle.vtxk];
+        return (A+B+C)/3;
+    }
+
+    std::vector<const TriangleIndices*> FindPossibleTrianglesBVH(const Ray& ray) const {
+        if (!bounding_box.intersect(ray)) return {}; // Early exit if ray doesn't intersect the bounding box
+    
+        BoundingBox last_bb = bounding_box;
+        std::vector<const TriangleIndices*> last_triangles;  // Use pointers here
+        for (const auto& triangle : indices) {
+            last_triangles.push_back(&triangle);  // Store pointers to TriangleIndices
+        }
+    
+        // Pre-allocate memory for triangle vectors to avoid frequent reallocations
+        std::vector<const TriangleIndices*> triangles1;
+        std::vector<const TriangleIndices*> triangles2;
+    
+        while (last_triangles.size() > 1000) {
+            int longest_dim = matrix_max_element_dim(last_bb.M - last_bb.m);
+            double mid = (last_bb.m[longest_dim] + last_bb.M[longest_dim]) / 2;
+    
+            // Clear vectors once per iteration to reuse memory
+            triangles1.clear();
+            triangles2.clear();
+    
+            // Classify triangles based on barycenter and place them into two sets
+            for (const TriangleIndices* triangle : last_triangles) {
+                const auto& barycenter = FindBarycenter(*triangle);
+                if (barycenter[longest_dim] >= mid) {
+                    triangles2.push_back(triangle);
+                } else {
+                    triangles1.push_back(triangle);
+                }
+            }
+    
+            // Compute bounding boxes only when needed
+            update_bbox(triangles1, longest_dim, last_bb);    
+            // Efficient intersection checks
+            if (last_bb.intersect(ray)) {
+                last_triangles = triangles1;
+                continue;
+            } 
+            
+            update_bbox(triangles2, longest_dim, last_bb);
+            if (last_bb.intersect(ray)) {
+                last_triangles = triangles2;
+                continue;
+            }
+            
+            return {}; // No intersection found
+
+        }
+    
+        return last_triangles;  // Return pointers to triangles
+    }    
     
     Intersection findIntersection (const Ray& ray) const override {
         
-        if (!bounding_box.intersect(ray)) return Intersection();
-        //std::vector<const TriangleIndices*> triangles_possible = FindPossibleTrianglesBVH(ray);
+        std::vector<const TriangleIndices*> triangles_possible = FindPossibleTrianglesBVH(ray);
 
         double closest_t = std::numeric_limits<double>::max();
         Vector closest_P, closest_N, texture = Vector(0, 0, 0);
     
-        for (const TriangleIndices& triangle : indices){
-            Vector B = vertices[triangle.vtxj];
-            Vector A = vertices[triangle.vtxi];
-            Vector C = vertices[triangle.vtxk];
+        for (const TriangleIndices* triangle : triangles_possible){
+            Vector A = vertices[triangle->vtxi];
+            Vector B = vertices[triangle->vtxj];
+            Vector C = vertices[triangle->vtxk];
 
-            Vector N_A = normals[triangle.vtxi];
-            Vector N_B = normals[triangle.vtxj];
-            Vector N_C = normals[triangle.vtxk];
+            Vector N_A = normals[triangle->vtxi];
+            Vector N_B = normals[triangle->vtxj];
+            Vector N_C = normals[triangle->vtxk];
 
-            Vector uv_A = uvs[triangle.vtxi];
-            Vector uv_B = uvs[triangle.vtxj];
-            Vector uv_C = uvs[triangle.vtxk];
+            Vector uv_A = uvs[triangle->vtxi];
+            Vector uv_B = uvs[triangle->vtxj];
+            Vector uv_C = uvs[triangle->vtxk];
 
             Vector e1 = B - A;
             Vector e2 = C - A;

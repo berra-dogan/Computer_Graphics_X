@@ -51,6 +51,7 @@
         "variant": "cpp",
         "vector": "cpp",
         "algorithm": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "list": "cpp"
     }
 }
