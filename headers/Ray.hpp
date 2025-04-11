@@ -21,8 +21,9 @@ class Ray {
 
 class Intersection {
     public:
-        explicit Intersection(bool is_intersected = false, bool is_tangent = false, double t = 0, const Vector intersection =  Vector(), const Vector normal =  Vector() )
-        : is_intersected(is_intersected), is_tangent(is_tangent), t(t), intersection(intersection), normal(normal) {}
+        explicit Intersection(bool is_intersected = false, bool is_tangent = false, double t = 0, const Vector intersection =  Vector(), 
+                            const Vector normal =  Vector(), const Vector texture =  Vector() )
+        : is_intersected(is_intersected), is_tangent(is_tangent), t(t), intersection(intersection), normal(normal), texture(texture) {}
 
         bool isIntersected() const { return is_intersected; }
         bool isTangent() const { return is_tangent; }
@@ -34,4 +35,5 @@ class Intersection {
     double t;
     Vector intersection;
     Vector normal;
+    Vector texture;
 };

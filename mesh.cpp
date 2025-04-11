@@ -84,6 +84,7 @@ class Scene {
                 std::shared_ptr<Geometry> obj = objects[obj_idx];
                 Vector P = result.first.intersection;
                 Vector N = result.first.normal; 
+                Vector texture = result.first.texture; 
                 if (obj->is_mirror){
                     r.O.update(P+EPSILON*N);
                     r.u = r.u - 2*dot(r.u, N)*N;
@@ -156,8 +157,8 @@ class Scene {
 };
 
 int main() {
-    int W = 256; //512
-    int H = 256; //512
+    int W = 512; //512
+    int H = 512; //512
     Vector camera_origin(0, 0, 55);
     double fov = 60*M_PI/180;
     Vector albedo(0.5, 0.5, 0.5);
