@@ -61,21 +61,46 @@ class Sphere: public Geometry {
         const double R;
 };
 
-class LightSource : public Sphere {
-    public:
-        explicit LightSource(const Vector& c, double R = 1, const Vector& albedo = Vector(1, 1, 1), double I = 1e10)
-            : Sphere(c, R, albedo), I(I) {}
+enum class LightType { POINT, SPHERE };
 
-        Vector GetRandomPoint(std::default_random_engine &engine, const Vector& x){
+class LightSource {
+    public:
+        explicit LightSource(const Vector& c, double I)
+            : c(c), I(I) {}
+        
+        virtual ~LightSource() {}
+    
+        virtual Vector GetRandomPoint(std::default_random_engine& engine, const Vector& x) const {
+            // Optional: default is just returning the position (e.g., for point lights)
+            return c;
+        }
+        
+        Vector c;
+        double I;
+        LightType type;
+};
+    
+    
+class PointLight : public LightSource {
+    public:
+        explicit PointLight(const Vector& c, double I)
+            : LightSource(c, I) {type=LightType::POINT;}
+};
+    
+    
+class SphereLight : public Sphere, public LightSource {
+    public:
+        explicit SphereLight(const Vector& c, double R = 1, const Vector& albedo = Vector(1, 1, 1), double I = 1e10)
+            : Sphere(c, R, albedo), LightSource(c, I) {type=LightType::SPHERE;}
+    
+        Vector GetRandomPoint(std::default_random_engine& engine, const Vector& x) const override {
             Vector D = x - center;
             D.normalize();
             Vector V = random_cos(engine, D);
-            return R*V+center;
+            return R * V + center;
         }
-    
-        double I;
 };
-
+        
 class BoundingBox {
     public:
         BoundingBox(Vector m = Vector(0, 0, 0), Vector M = Vector(0, 0, 0)) : m(m), M(M) {}
