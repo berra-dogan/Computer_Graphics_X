@@ -27,7 +27,7 @@ INCLUDES ?= -I$(PROJECT_DIR)/stb/ -I$(PROJECT_DIR)/headers/
 OUT ?= $(basename $(SRC))
 
 CFLAGS += -I/opt/homebrew/opt/libomp/include -Xpreprocessor -fopenmp -stdlib=libc++
-LDFLAGS = -L/opt/homebrew/opt/libomp/lib -lomp -lc++
+LDFLAGS = -L/opt/homebrew/opt/libomp/lib -lomp -lc++ -Wall
 
 all:
 	$(CC) $(CFLAGS) $(INCLUDES) $(SRC) -o $(OUT) $(LDFLAGS)

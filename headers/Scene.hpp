@@ -13,7 +13,6 @@ class Scene {
             Intersection closestIntersection;
             double closest_t = std::numeric_limits<double>::max();
             int closestIdx = -1;
-            bool any_opaque = false;
     
             for (size_t idx = 0; idx < objects.size(); ++idx) {
                 if (idx==in_obj_idx) continue;
@@ -24,6 +23,7 @@ class Scene {
                         closestIntersection = intersection;
                         closestIdx = idx;
                         closest_t = intersection.t;
+                        
                     }
                 }
             }
@@ -80,7 +80,6 @@ class Scene {
                     double k0 = k0_sqrt*k0_sqrt;
                     double dp = dot(r.u, N);
                     double R = k0 + (1-k0)*std::pow(1-abs(dp), 5);
-                    double T = 1 - R;
                     double ratio = ref_idx/obj->ref_idx;
                     if (dp>=0) {
                         ratio = 1/ratio;
@@ -104,7 +103,7 @@ class Scene {
 
                 } else {
                     Vector Lo(0.,0.,0.);
-                    for (const std::shared_ptr<LightSource> light_ptr: lights){
+                    for (const std::shared_ptr<LightSource>& light_ptr: lights){
                         LightSource& light = *light_ptr;
                         Vector xprime = light.GetRandomPoint(engine, P);
                         Vector Nprime = (xprime-light.center)/(xprime-light.center).norm();
@@ -120,14 +119,14 @@ class Scene {
                             Lo = Lo + Vector(0., 0., 0.);
                         } else {
                             double pdf = std::max(dot(Nprime, (P-light.center)/(P-light.center).norm())/(M_PI*light.R*light.R), 0.);
-                            Lo = Lo + light.I/(4*M_PI*M_PI*light.R*light.R) * (*objects[obj_idx]).albedo/M_PI * std :: max(
+                            Lo = Lo + light.I/(4*M_PI*M_PI*light.R*light.R) * texture/M_PI * std :: max(
                                 dot(N, omega_i), 0.)*std::max(dot(Nprime, -omega_i), 0.)/((xprime-P).norm2() * pdf);
                         }
                     }
 
                     //Indirect Lighting
                     Ray randomRay(P+EPSILON*N, random_cos(engine, N));
-                    Lo = Lo + obj->albedo * getColor(randomRay, engine, ray_depth - 1, obj_idx);
+                    Lo = Lo + obj->albedo * getColor(randomRay, engine, false, ray_depth - 1, obj_idx);
 
                     return Lo;
                 }

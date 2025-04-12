@@ -5,6 +5,7 @@
 #include "helpers.hpp"
 #include <cassert>
 #include <iostream>
+#include <list>
 
 class Geometry {
     public:
@@ -52,7 +53,7 @@ class Sphere: public Geometry {
                 Vector intersectionPoint = ray.getOrigin() + ray.getDirection() * t; //P
                 Vector pc = intersectionPoint - center;
                 Vector normal = pc / pc.norm();
-                return Intersection(true, discriminant==0, t, intersectionPoint, normal);
+                return Intersection(true, discriminant==0, t, intersectionPoint, normal, albedo);
             }
             return Intersection(false);  // No intersection
         }
@@ -80,8 +81,10 @@ class BoundingBox {
     public:
         BoundingBox(Vector m = Vector(0, 0, 0), Vector M = Vector(0, 0, 0)) : m(m), M(M) {}
     
-        bool intersect(const Ray& r) const {
+        bool intersect(const Ray& r, double& inter_distance) const {
             // Compute t values for the X axis
+            if (r.u[0]==0 || r.u[1]==0 || r.u[2]==0) return true;
+
             double tx1 = (m[0] - r.O[0]) / r.u[0];
             double tx2 = (M[0] - r.O[0]) / r.u[0];
             double txMin = std::min(tx1, tx2);
@@ -104,11 +107,22 @@ class BoundingBox {
             double t2 = std::min(txMax, std::min(tyMax, tzMax));
     
             // Check if there is an intersection
+            inter_distance = t1;
             return t2 >= t1;
         }
     
         Vector m, M;
-    };
+};
+
+struct NodeBVH {
+    BoundingBox bbox;
+    int starting_triangle;
+    int ending_triangle;
+    NodeBVH* child_left;
+    NodeBVH* child_right;
+
+    NodeBVH(){}
+};
     
 
 class TriangleIndices {
@@ -133,15 +147,6 @@ public:
             this->is_transparent = is_transparent;
             this->ref_idx = ref_idx;
     }
-    TriangleMesh(std::vector<TriangleIndices> indices, std::vector<Vector> vertices, std::vector<Vector> normals,
-                std::vector<Vector> uvs, std::vector<Vector> vertexcolors, const Vector& albedo, 
-                bool is_mirror = false, bool is_transparent = false, double ref_idx = 1.5) {
-        assert(!(is_mirror && is_transparent) && "Error message");
-        this->albedo = albedo;         
-        this->is_mirror = is_mirror;
-        this->is_transparent = is_transparent;
-        this->ref_idx = ref_idx;
-    };
     
     void readOBJ(const char* obj) {
 
@@ -323,40 +328,119 @@ public:
         }
     }
 
-    BoundingBox compute_bbox() {
+    static int get_longest(const Vector& diag) {
+        if (diag[0]>=diag[1] && diag[0]>=diag[2]) return 0;
+        else if (diag[1]>=diag[2]) return 1;
+        return 2;
+    }
+
+    Vector FindBarycenter(const TriangleIndices& triangle) const {
+        Vector A = vertices[triangle.vtxi];
+        Vector B = vertices[triangle.vtxj];
+        Vector C = vertices[triangle.vtxk];
+        return (A+B+C)/3;
+    }
+
+    BoundingBox compute_bbox(int starting_triangle, int ending_triangle) const {
         BoundingBox bounding_box;
         bounding_box.m = Vector(1E9,1E9,1E9);
         bounding_box.M = Vector(-1E9,-1E9,-1E9);
-        for (int i = 0; i<vertices.size(); i++) {
-            for (int j=0; j<3; j++){
-                bounding_box.m[j] = std::min(bounding_box.m[j], vertices[i][j]);
-                bounding_box.M[j] = std::max(bounding_box.M[j], vertices[i][j]);
+        for (int i = starting_triangle; i<ending_triangle; i++) {
+            for (Vector vertex : {vertices[indices[i].vtxi], vertices[indices[i].vtxj], vertices[indices[i].vtxk]}){
+                for (int j=0; j<3; j++){
+                    bounding_box.m[j] = std::min(bounding_box.m[j], vertex[j]);
+                    bounding_box.M[j] = std::max(bounding_box.M[j], vertex[j]);
+                }
             }
         }
 
         return bounding_box;
     }
+
+    void ConstructBVH(NodeBVH* node, int starting_triangle, int ending_triangle) const {
+
+        node->bbox = compute_bbox(starting_triangle, ending_triangle); 
+        node->starting_triangle = starting_triangle;
+        node->ending_triangle = ending_triangle;
+        node->child_left = nullptr;
+        node->child_right = nullptr;
+
+        Vector diag = node->bbox.M-node->bbox.m;
+        Vector middle_diag = node->bbox.m+diag*0.5;
+        int longest_axis = get_longest(diag);
+        int pivot_index = starting_triangle;
+
+        for (int i=starting_triangle; i<ending_triangle; ++i){
+            Vector barycenter = FindBarycenter(indices[i]);
+            if (barycenter[longest_axis] < middle_diag[longest_axis]){
+                std::swap(indices[i], indices[pivot_index]);
+                ++pivot_index;
+            }
+        }
+
+        if (pivot_index<=starting_triangle || pivot_index>=ending_triangle-1 || ending_triangle-starting_triangle<5) return;
+    
+        node->child_left = new NodeBVH();
+        node->child_right = new NodeBVH();
+        
+        ConstructBVH(node->child_left, starting_triangle, pivot_index);
+        ConstructBVH(node->child_right, pivot_index, ending_triangle);
+
+    }    
     
     Intersection findIntersection (const Ray& ray) const override {
+
+        // NodeBVH* root = new NodeBVH();
+        // ConstructBVH(root, 0, indices.size());
         
-        if (!bounding_box.intersect(ray)) return Intersection();
-        //std::vector<const TriangleIndices*> triangles_possible = FindPossibleTrianglesBVH(ray);
+        // double distance;
+        // if (!root->bbox.intersect(ray, distance)) return Intersection();
 
-        double closest_t = std::numeric_limits<double>::max();
+        // std::list<NodeBVH*> nodes_to_visit;
+        // nodes_to_visit.push_front(root);
+        // double best_inter_distance = std::numeric_limits<double>::max();
+        // NodeBVH* curNode;
+        
+        // while (!nodes_to_visit.empty()){
+        //     curNode = nodes_to_visit.back();
+        //     nodes_to_visit.pop_back();
+        //     double inter_distance = 0;
+        //     if (curNode->child_left){
+        //         if (curNode->child_left->bbox.intersect(ray, inter_distance)){
+        //             if (inter_distance<best_inter_distance){
+        //                 nodes_to_visit.push_back(curNode->child_left);
+        //             }
+        //         }
+        //     }
+        //     if (curNode->child_right){
+        //         if (curNode->child_right->bbox.intersect(ray, inter_distance)){
+        //             if (inter_distance<best_inter_distance){
+        //                 nodes_to_visit.push_back(curNode->child_right);
+        //             }
+        //         }
+        //     }   
+        //     if (!curNode->child_left && !curNode->child_right){
+        //         break;
+        //     }
+        // }
+
         Vector closest_P, closest_N, texture = Vector(0, 0, 0);
-    
-        for (const TriangleIndices& triangle : indices){
-            Vector B = vertices[triangle.vtxj];
-            Vector A = vertices[triangle.vtxi];
-            Vector C = vertices[triangle.vtxk];
+        double best_inter_distance = std::numeric_limits<double>::max();
+        //for (int i = curNode->starting_triangle; i<curNode->ending_triangle; i++){
+        for (int i = 0; i<indices.size(); i++){
+            TriangleIndices* triangle = &indices[i];
 
-            Vector N_A = normals[triangle.vtxi];
-            Vector N_B = normals[triangle.vtxj];
-            Vector N_C = normals[triangle.vtxk];
+            Vector A = vertices[triangle->vtxi];
+            Vector B = vertices[triangle->vtxj];
+            Vector C = vertices[triangle->vtxk];
 
-            Vector uv_A = uvs[triangle.vtxi];
-            Vector uv_B = uvs[triangle.vtxj];
-            Vector uv_C = uvs[triangle.vtxk];
+            Vector N_A = normals[triangle->vtxi];
+            Vector N_B = normals[triangle->vtxj];
+            Vector N_C = normals[triangle->vtxk];
+
+            Vector uv_A = uvs[triangle->vtxi];
+            Vector uv_B = uvs[triangle->vtxj];
+            Vector uv_C = uvs[triangle->vtxk];
 
             Vector e1 = B - A;
             Vector e2 = C - A;
@@ -367,7 +451,7 @@ public:
     
             Vector AO = A - ray.O;
             double t = dot(AO, N)/uN_dot;
-            if (t<EPSILON || t>closest_t) continue;
+            if (t<EPSILON || t>best_inter_distance) continue;
     
             double beta = dot(e2, cross(AO, ray.u)) / uN_dot;
             double gamma =  -dot(e1, cross(AO, ray.u)) / uN_dot;
@@ -377,7 +461,7 @@ public:
                 continue;
             }
     
-            closest_t = t;
+            best_inter_distance = t;
             closest_P = A + beta*e1 + gamma*e2;
             N.normalize();
             //closest_N = N;
@@ -385,12 +469,13 @@ public:
             texture = alpha*uv_A+beta*uv_B+gamma*uv_C;
         }
     
-        if (closest_t == std::numeric_limits<double>::max()) return Intersection(false);
+        if (best_inter_distance == std::numeric_limits<double>::max()) return Intersection(false);
     
-        return Intersection(true, false, closest_t, closest_P, closest_N, texture);
+        return Intersection(true, false, best_inter_distance, closest_P, closest_N, texture);
+        
     }    
     
-    std::vector<TriangleIndices> indices;
+    mutable std::vector<TriangleIndices> indices;
     std::vector<Vector> vertices;
     std::vector<Vector> normals;
     std::vector<Vector> uvs;
