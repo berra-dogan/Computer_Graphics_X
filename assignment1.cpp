@@ -240,7 +240,7 @@ int example4() {
     std::chrono::duration<double> duration = end_time - start_time;
     std::cout << "Elapsed time: " << duration.count() << " seconds" << std::endl;
     
-    stbi_write_png("example4.png", W, H, 3, &image[0], 0);
+    stbi_write_png("output_images/example4.png", W, H, 3, &image[0], 0);
  
     return 0;
 }
@@ -315,5 +315,5 @@ int example_mesh(){
 
 
 int main() {
-    return example_mesh();
+    return example4();
 }
