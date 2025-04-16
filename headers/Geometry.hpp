@@ -509,6 +509,8 @@ public:
         // int V = (1-UV[1]) * texturesW[indices[i].group]
         // int texWidth = texturesW[indices[i].group].size()
         // Vector texture = (textures[indices[i].group][(V*texWidth+U)*3+0], textures[indices[i].group][(V*texWidth+U)*3+1], textures[indices[i].group][(V*texWidth+U)*3+2]);
+
+        Vector texture(1., 1., 1.);
         
        return Intersection(true, false, best_inter_distance, closest_P, closest_N, texture);
         
