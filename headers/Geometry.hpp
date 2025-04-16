@@ -132,8 +132,7 @@ class BoundingBox {
             double t2 = std::min(txMax, std::min(tyMax, tzMax));
     
             // Check if there is an intersection
-            inter_distance = t1;
-            return t2 >= t1;
+            return (t2 >= t1 && t1 > -EPSILON);
         }
     
         Vector m, M;
@@ -353,6 +352,22 @@ public:
         }
     }
 
+    std::vector<std::vector<double>> textures;
+    std::vector<int> texturesW;
+    std::vector<int> texturesH;
+
+    void load_texture(const char* filename){
+        int W, H, C;
+        unsigned char* tex = stbi_load(filename, &W, &H, &C, 3);
+        texturesW.push_back(W);
+        texturesH.push_back(H);
+        std::vector<double> current_tex(W*H*3);
+        for (int i = 0; i < W * H * 3; i++){
+            current_tex[i] = std::pow(tex[i],2.2); //SUPER UNSURE
+        }
+        textures.push_back(current_tex);
+    }
+
     static int get_longest(const Vector& diag) {
         if (diag[0]>=diag[1] && diag[0]>=diag[2]) return 0;
         else if (diag[1]>=diag[2]) return 1;
@@ -419,10 +434,15 @@ public:
         if (!bounding_box_root->bbox.intersect(ray, distance)) return Intersection();
 
         std::list<NodeBVH*> nodes_to_visit;
+        // TO FURTHER IMPROVE
+        // const NodeBVH* nodes_to_visit[20];
+        // l[0] = bounding_box_root;
+        // int element_idx = 1;
         nodes_to_visit.push_front(bounding_box_root);
         double best_inter_distance = std::numeric_limits<double>::max();
         NodeBVH* curNode = nullptr;
-        Vector closest_P, closest_N, texture = Vector(0, 0, 0);
+        Vector closest_P, closest_N, UV = Vector(0, 0, 0);
+        int closest_triangle_idx = -1;
         
         while (!nodes_to_visit.empty()){
             curNode = nodes_to_visit.back();
@@ -447,9 +467,9 @@ public:
                     Vector N_B = normals[triangle->nj];
                     Vector N_C = normals[triangle->nk];
         
-                    Vector uv_A = uvs[triangle->uvi]/255;
-                    Vector uv_B = uvs[triangle->uvj]/255;
-                    Vector uv_C = uvs[triangle->uvk]/255;
+                    Vector uv_A = uvs[triangle->uvi];
+                    Vector uv_B = uvs[triangle->uvj];
+                    Vector uv_C = uvs[triangle->uvk];
         
                     Vector e1 = B - A;
                     Vector e2 = C - A;
@@ -476,15 +496,21 @@ public:
                     //closest_N = N;
                     closest_N = alpha*N_A+beta*N_B+gamma*N_C;
                     closest_N.normalize();
-                    texture = alpha*uv_A+beta*uv_B+gamma*uv_C;
-                    texture.normalize();
+                    closest_triangle_idx = i;
+                    UV = alpha*uv_A+beta*uv_B+gamma*uv_C;
                 }
             } 
         }
-    
+        
         if (best_inter_distance == std::numeric_limits<double>::max()) return Intersection(false);
-    
-        return Intersection(true, false, best_inter_distance, closest_P, closest_N, texture);
+
+        // int U = std::max(0., std::min(UV[0] * texturesW[indices[i].group] - 1, )
+        // int V = std::max(0., std::min(UV[1] * texturesW[indices[i].group] - 1, ) 
+        // int V = (1-UV[1]) * texturesW[indices[i].group]
+        // int texWidth = texturesW[indices[i].group].size()
+        // Vector texture = (textures[indices[i].group][(V*texWidth+U)*3+0], textures[indices[i].group][(V*texWidth+U)*3+1], textures[indices[i].group][(V*texWidth+U)*3+2]);
+        
+       return Intersection(true, false, best_inter_distance, closest_P, closest_N, texture);
         
     }    
     

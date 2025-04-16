@@ -248,7 +248,7 @@ int example4() {
 }
 
 int example_mesh(){
-    int nb_paths = 16;
+    int nb_paths = 2;
 
     int W = 512;
     int H = 512;
@@ -257,6 +257,7 @@ int example_mesh(){
     Vector albedo(0.5, 0.5, 0.5);
 
     TriangleMesh catMesh(Vector(1.,1.,1.));
+    catMesh.readOBJ("cadnav.com_model/Models_F0202A090/cat.obj");
     catMesh.readOBJ("cadnav.com_model/Models_F0202A090/cat.obj");
     catMesh.applyTransform(Vector(0.6, 0.6, 0.6), Vector(0, -10, 0));
     // catMesh.bounding_box = catMesh.compute_bbox();
