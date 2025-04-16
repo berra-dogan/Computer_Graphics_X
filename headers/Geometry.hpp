@@ -364,7 +364,7 @@ public:
     
     Intersection findIntersection (const Ray& ray) const override {
         
-        if (!bounding_box.intersect(ray)) return Intersection();
+        //if (!bounding_box.intersect(ray)) return Intersection();
         //std::vector<const TriangleIndices*> triangles_possible = FindPossibleTrianglesBVH(ray);
 
         double closest_t = std::numeric_limits<double>::max();

@@ -114,7 +114,7 @@ class Scene {
                         return getColor(r_rfr, engine, true, ray_depth-1, obj_idx);
                     }
 
-                } else {
+                } else { //Diffuse Object
                     Vector Lo(0.,0.,0.);
                     for (const std::shared_ptr<LightSource>& light_ptr: lights){
                         if ((*light_ptr).type==LightType::POINT){

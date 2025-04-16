@@ -390,44 +390,43 @@ public:
     
     Intersection findIntersection (const Ray& ray) const override {
 
-        // NodeBVH* root = new NodeBVH();
-        // ConstructBVH(root, 0, indices.size());
+        NodeBVH* root = new NodeBVH();
+        ConstructBVH(root, 0, indices.size());
         
-        // double distance;
-        // if (!root->bbox.intersect(ray, distance)) return Intersection();
+        double distance;
+        if (!root->bbox.intersect(ray, distance)) return Intersection();
 
-        // std::list<NodeBVH*> nodes_to_visit;
-        // nodes_to_visit.push_front(root);
-        // double best_inter_distance = std::numeric_limits<double>::max();
-        // NodeBVH* curNode;
+        std::list<NodeBVH*> nodes_to_visit;
+        nodes_to_visit.push_front(root);
+        double best_inter_distance = std::numeric_limits<double>::max();
+        NodeBVH* curNode;
         
-        // while (!nodes_to_visit.empty()){
-        //     curNode = nodes_to_visit.back();
-        //     nodes_to_visit.pop_back();
-        //     double inter_distance = 0;
-        //     if (curNode->child_left){
-        //         if (curNode->child_left->bbox.intersect(ray, inter_distance)){
-        //             if (inter_distance<best_inter_distance){
-        //                 nodes_to_visit.push_back(curNode->child_left);
-        //             }
-        //         }
-        //     }
-        //     if (curNode->child_right){
-        //         if (curNode->child_right->bbox.intersect(ray, inter_distance)){
-        //             if (inter_distance<best_inter_distance){
-        //                 nodes_to_visit.push_back(curNode->child_right);
-        //             }
-        //         }
-        //     }   
-        //     if (!curNode->child_left && !curNode->child_right){
-        //         break;
-        //     }
-        // }
+        while (!nodes_to_visit.empty()){
+            curNode = nodes_to_visit.back();
+            nodes_to_visit.pop_back();
+            double inter_distance = 0;
+            if (curNode->child_left){
+                if (curNode->child_left->bbox.intersect(ray, inter_distance)){
+                    if (inter_distance<best_inter_distance){
+                        nodes_to_visit.push_back(curNode->child_left);
+                    }
+                }
+            }
+            if (curNode->child_right){
+                if (curNode->child_right->bbox.intersect(ray, inter_distance)){
+                    if (inter_distance<best_inter_distance){
+                        nodes_to_visit.push_back(curNode->child_right);
+                    }
+                }
+            }   
+            if (!curNode->child_left && !curNode->child_right){
+                break;
+            }
+        }
 
         Vector closest_P, closest_N, texture = Vector(0, 0, 0);
         double best_inter_distance = std::numeric_limits<double>::max();
-        //for (int i = curNode->starting_triangle; i<curNode->ending_triangle; i++){
-        for (int i = 0; i<indices.size(); i++){
+        for (int i = curNode->starting_triangle; i<curNode->ending_triangle; i++){
             TriangleIndices* triangle = &indices[i];
 
             Vector A = vertices[triangle->vtxi];

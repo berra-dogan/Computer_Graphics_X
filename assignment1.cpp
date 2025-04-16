@@ -248,7 +248,7 @@ int example4() {
 }
 
 int example_mesh(){
-    int nb_paths = 5;
+    int nb_paths = 2;
 
     int W = 512;
     int H = 512;
@@ -282,9 +282,8 @@ int example_mesh(){
     auto start_time = std::chrono::high_resolution_clock::now();
     #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < H; i++) {
-        #pragma omp parallel for schedule(dynamic)
+        std::default_random_engine engine(i);
         for (int j = 0; j < W; j++) {
-            std::default_random_engine engine(i*W+j);
             double z = -W / (2. * tan(fov/2));
             Vector r_dir(j-W/2+0.5, H/2-i+0.5, z);
             r_dir.normalize();
@@ -316,9 +315,9 @@ int example_mesh(){
 
 
 int main() {
-    example1();
-    example2();
-    example3();
-    example4();
+    // example1();
+    // example2();
+    // example3();
+    // example4();
     example_mesh();
 }
