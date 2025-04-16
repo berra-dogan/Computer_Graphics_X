@@ -248,7 +248,7 @@ int example4() {
 }
 
 int example_mesh(){
-    int nb_paths = 2;
+    int nb_paths = 16;
 
     int W = 512;
     int H = 512;
@@ -259,7 +259,10 @@ int example_mesh(){
     TriangleMesh catMesh(Vector(1.,1.,1.));
     catMesh.readOBJ("cadnav.com_model/Models_F0202A090/cat.obj");
     catMesh.applyTransform(Vector(0.6, 0.6, 0.6), Vector(0, -10, 0));
-    catMesh.bounding_box = catMesh.compute_bbox();
+    // catMesh.bounding_box = catMesh.compute_bbox();
+
+    catMesh.bounding_box_root = new NodeBVH();
+    catMesh.ConstructBVH(catMesh.bounding_box_root, 0, catMesh.indices.size());
 
     std::vector<std::shared_ptr<Geometry>> objects = {
         std::make_shared<Sphere>(Vector(0, 0, 1000), 940, Vector(0.9, 0.2, 0.9)),  // left-wall
@@ -272,8 +275,8 @@ int example_mesh(){
     };
 
     std::vector<std::shared_ptr<LightSource>> standard_scene_lights = {
-        //std::make_shared<PointLight>(Vector(-10, 20, 40), 3e10),
-        std::make_shared<SphereLight>(Vector(-10, 20, 40), 2, Vector(1., 1., 1.), 3e10),
+        std::make_shared<PointLight>(Vector(-10, 20, 40), 1e10),
+        //std::make_shared<SphereLight>(Vector(-10, 20, 40), 2, Vector(1., 1., 1.), 3e10),
     };
 
     Scene scene(objects, standard_scene_lights);
