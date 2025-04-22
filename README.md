@@ -15,7 +15,7 @@ Ray tracer implemented in C++. The project supports:
 ## Build Instructions
 
 * Run the command "make SRC=assignment1.cpp"
-* Run the command "./assignment1 image\_num" with the example from ./assignment1 that you would like to reconstruct
+* Run the command "./assignment1 image\_num" with image\_num associated to the example from ./assignment1 that you would like to reconstruct
 * The rendered images will be displayed at output_images/
 
 ## Author
