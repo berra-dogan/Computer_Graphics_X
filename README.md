@@ -3,6 +3,7 @@
 Ray tracer implemented in C++. The project supports:
 - Diffuse and mirror surfaces
 - (extra) Transparent and hollow spheres
+- (extra) Fresnel and Monte Carlo Integration
 - Point and (extra) spherical light sources
 - (extra) Use of multiple light sources within the same scene
 - Direct and indirect lighting

@@ -23,7 +23,7 @@ std::vector<std::shared_ptr<Geometry>> background = {
     std::make_shared<Sphere>(Vector(1000, 0, 0), 940, Vector(0.9, 0.4, 0.3)),  // wall-behind-camera
 };
 
-int example_struct(int W, int H, Scene scene, char const * file_name, bool include_antialiasing, int nb_paths = 1){
+int example_struct(int W, int H, Scene scene, char const * file_name, bool include_antialiasing, int nb_paths = 1, int ray_depth = 5){
 
     Vector camera_origin(0, 0, 55);
     double fov = 60*M_PI/180;
@@ -48,11 +48,11 @@ int example_struct(int W, int H, Scene scene, char const * file_name, bool inclu
                     Vector random_dir = r_dir+sample*stdev;
                     random_dir.normalize();
                     Ray ray(camera_origin, random_dir);
-                    pixelColor = pixelColor + scene.getColor(ray, engine, false);
+                    pixelColor = pixelColor + scene.getColor(ray, engine, false, ray_depth);
                 }
             } else {
                 Ray ray(camera_origin, r_dir);
-                pixelColor = scene.getColor(ray, engine, false);
+                pixelColor = scene.getColor(ray, engine, false, ray_depth);
             }
             image[(i * W + j) * 3 + 0] = std::min(255., std::pow(pixelColor[0]/nb_paths, 1/2.2));
             image[(i * W + j) * 3 + 1] = std::min(255., std::pow(pixelColor[1]/nb_paths, 1/2.2));
