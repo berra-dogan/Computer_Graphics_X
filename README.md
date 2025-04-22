@@ -10,6 +10,7 @@ Ray tracer implemented in C++. The project supports:
 - Ray-mesh intersection with BVH
 - (extra) Normals and textures for textures for triangle meshes
 
+The report is shared in the file "Assignment1-Report.pdf".
 ---
 
 ## Build Instructions
