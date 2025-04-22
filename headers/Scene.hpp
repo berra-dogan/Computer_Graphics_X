@@ -61,7 +61,7 @@ class Scene {
             return {closestIntersection, closestLightIdx};  // Return the closest intersection (if any)
         }
 
-        Vector getColor(Ray& r, std::default_random_engine &engine, bool last_bounce_diffuse, int ray_depth = 10, int in_obj_idx = -1) {
+        Vector getColor(Ray& r, std::default_random_engine &engine, bool last_bounce_diffuse, int ray_depth = 5, int in_obj_idx = -1) {
             if (ray_depth==0) return Vector(0,0,0);
             std::pair<Intersection, int> result = findIntersection(r, in_obj_idx);
             std::pair<Intersection, int> result_light = findIntersectionLight(r);

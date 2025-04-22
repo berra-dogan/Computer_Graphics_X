@@ -8,6 +8,7 @@
 #include "stb_image.h"
 
 #include <iostream>
+#include <cstdlib>
 
 #include "Vector.hpp"
 #include "Geometry.hpp"
@@ -144,7 +145,7 @@ int example4() {
 }
 
 int example5(){
-    int nb_paths = 2;
+    int nb_paths = 32;
     int W = 512;
     int H = 512;
 
@@ -223,12 +224,37 @@ int example7(){
 }
 
 
-int main() {
-    example1();
-    example2();
-    example3();
-    example4();
-    example5();
-    example6();
-    example7();
+// int main() {
+//     example1();
+//     example2();
+//     example3();
+//     example4();
+//     example5();
+//     example6();
+//     example7();
+// }
+
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Wrong number of arguments";
+        std::cerr << "The intended usage: " << argv[0] << " <example_number>\n";
+        return 1;
+    }
+
+    int n = std::atoi(argv[1]);
+
+    switch (n) {
+        case 1: example1(); break;
+        case 2: example2(); break;
+        case 3: example3(); break;
+        case 4: example4(); break;
+        case 5: example5(); break;
+        case 6: example6(); break;
+        case 7: example7(); break;
+        default:
+            std::cerr << "Invalid example number. Please input a number from 1 to 7.\n";
+            return 1;
+    }
+
+    return 0;
 }

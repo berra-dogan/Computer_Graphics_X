@@ -7,7 +7,7 @@
 #include <iostream>
 #include <list>
 
-#define STOP_NUM_TRG 10
+#define STOP_NUM_TRG 15
 
 class Geometry {
     public:
@@ -420,7 +420,7 @@ public:
             }
         }
 
-        if (pivot_index<=starting_triangle || pivot_index>=ending_triangle-1 || ending_triangle-starting_triangle<STOP_NUM_TRG) return;
+        if (pivot_index<=starting_triangle || pivot_index>=ending_triangle-1 || ending_triangle-starting_triangle<6) return;
     
         node->child_left = new NodeBVH();
         node->child_right = new NodeBVH();
@@ -432,28 +432,28 @@ public:
     
     Intersection findIntersection (const Ray& ray) const override {
 
-        if (!bounding_box_root->bbox.intersect(ray)) return Intersection();
-
-        std::list<NodeBVH*> nodes_to_visit;
-        // TO FURTHER IMPROVE
-        // const NodeBVH* nodes_to_visit[2* STOP_NUM_TRG];
-        // l[0] = bounding_box_root;
-        // int element_idx = 1;
-        nodes_to_visit.push_front(bounding_box_root);
         double best_inter_distance = std::numeric_limits<double>::max();
-        NodeBVH* curNode = nullptr;
         Vector closest_P, closest_N, UV = Vector(0, 0, 0);
         int closest_triangle_idx = -1;
+
+        if (!bounding_box_root->bbox.intersect(ray)) return Intersection();
+
+        NodeBVH* nodes_to_visit[20];
+        nodes_to_visit[0] = bounding_box_root;
+        int elt_idx = 1;
+        NodeBVH* curNode = nullptr;
         
-        while (!nodes_to_visit.empty()){
-            curNode = nodes_to_visit.back();
-            nodes_to_visit.pop_back();
+        while (elt_idx > 0){
+            curNode = nodes_to_visit[elt_idx-1];
+            --elt_idx;
             if (curNode->child_left){ //not a leaf: also implies curNode->child_right
                 if (curNode->child_left->bbox.intersect(ray)){
-                    nodes_to_visit.push_back(curNode->child_left);
+                    nodes_to_visit[elt_idx] = curNode->child_left;
+                    ++elt_idx;
                 }
                 if (curNode->child_right->bbox.intersect(ray)){
-                    nodes_to_visit.push_back(curNode->child_right);
+                    nodes_to_visit[elt_idx] = curNode->child_right;
+                    ++elt_idx;
                 }
             } else{
                 for (int i = curNode->starting_triangle; i<curNode->ending_triangle; i++){
