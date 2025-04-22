@@ -492,9 +492,11 @@ public:
             
                     best_inter_distance = t;
                     closest_P = A + beta*e1 + gamma*e2;
-                    //N.normalize();
-                    //closest_N = N;
-                    closest_N = alpha*N_A+beta*N_B+gamma*N_C;
+                    if (includeNormals){
+                        closest_N = alpha*N_A+beta*N_B+gamma*N_C;
+                    } else{
+                        closest_N = N;
+                    }
                     closest_N.normalize();
                     closest_triangle_idx = i;
                     UV = alpha*uv_A+beta*uv_B+gamma*uv_C;
@@ -504,27 +506,17 @@ public:
         
         if (best_inter_distance == std::numeric_limits<double>::max()) return Intersection(false);
 
-        int texWidth = texturesW[indices[closest_triangle_idx].group];
-        int texHeight = texturesH[indices[closest_triangle_idx].group];
+        Vector texture = this->albedo;
         
-        double u = std::clamp(UV[0], 0.0, 1.0);
-        double v = std::clamp(UV[1], 0.0, 1.0);
+        if (includeTexture){
+            int texWidth = texturesW[indices[closest_triangle_idx].group];
+            int texHeight = texturesH[indices[closest_triangle_idx].group];
+            
+            int U = std::min(std::max(int(UV[0] * texWidth), 0), texWidth - 1);
+            int V = std::min(std::max(int((1-UV[1]) * texHeight), 0), texHeight - 1);
 
-        // Flip V to match image orientation
-        int U = std::min(int(u * texWidth), texWidth - 1);
-        int V = std::min(int((1.0 - v) * texHeight), texHeight - 1);
-
-        // int U = std::max(0., std::fmod(UV[0]* texturesW[indices[closest_triangle_idx].group] - 1, 1.));
-        // int V = std::max(0., std::fmod(UV[1]* texturesW[indices[closest_triangle_idx].group] - 1, 1.));
-        // int U = std::max(0., std::min(UV[0] * texturesW[indices[i].group], )
-        // int V = std::max(0., std::min(UV[1] * texturesW[indices[i].group] - 1, ) 
-        // int V = (1-UV[1]) * texturesW[indices[i].group]
-        //int texWidth = texturesW[indices[closest_triangle_idx].group];
-        Vector texture(textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+0], textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+1], textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+2]);
-
-        // std::cout<< texture[2];
-        // Vector texture(0., 0., 0.);
-        
+            texture = Vector(textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+0], textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+1], textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+2]);
+        }
        return Intersection(true, false, best_inter_distance, closest_P, closest_N, texture);
         
     }    
@@ -535,5 +527,6 @@ public:
     std::vector<Vector> uvs;
     std::vector<Vector> vertexcolors;
     NodeBVH* bounding_box_root;
-    
+    bool includeNormals = true;
+    bool includeTexture = true;
 };
