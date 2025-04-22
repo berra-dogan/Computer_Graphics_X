@@ -11,7 +11,7 @@ class Scene {
             }
     
         // Method to find the closest intersection with a ray
-        std::pair<Intersection, int> findIntersection(const Ray& ray, int in_obj_idx = std::numeric_limits<double>::max()) const {
+        std::pair<Intersection, int> findIntersection(const Ray& ray, int in_obj_idx = INT_MAX) const {
             Intersection closestIntersection;
             double closest_t = std::numeric_limits<double>::max();
             int closestIdx = -1;

@@ -7,6 +7,8 @@
 #include <iostream>
 #include <list>
 
+#define STOP_NUM_TRG 10
+
 class Geometry {
     public:
         virtual ~Geometry() = default;  // Virtual destructor for proper cleanup
@@ -50,7 +52,7 @@ class Sphere: public Geometry {
                     t = -b + sqrt(discriminant);
                     if (t<0) return Intersection(false);
                 }
-                Vector intersectionPoint = ray.getOrigin() + ray.getDirection() * t; //P
+                Vector intersectionPoint = ray.O + ray.u * t; //P
                 Vector pc = intersectionPoint - center;
                 Vector normal = pc / pc.norm();
                 return Intersection(true, discriminant==0, t, intersectionPoint, normal, albedo);
@@ -106,7 +108,7 @@ class BoundingBox {
     public:
         BoundingBox(Vector m = Vector(0, 0, 0), Vector M = Vector(0, 0, 0)) : m(m), M(M) {}
     
-        bool intersect(const Ray& r, double& inter_distance) const {
+        bool intersect(const Ray& r) const {
             // Compute t values for the X axis
             if (r.u[0]==0 || r.u[1]==0 || r.u[2]==0) return true;
 
@@ -151,7 +153,7 @@ struct NodeBVH {
 
 class TriangleIndices {
     public:
-        TriangleIndices(int vtxi = -1, int vtxj = -1, int vtxk = -1, int ni = -1, int nj = -1, int nk = -1, int uvi = -1, int uvj = -1, int uvk = -1, int group = -1, bool added = false) : vtxi(vtxi), vtxj(vtxj), vtxk(vtxk), uvi(uvi), uvj(uvj), uvk(uvk), ni(ni), nj(nj), nk(nk), group(group) {
+        TriangleIndices(int vtxi = -1, int vtxj = -1, int vtxk = -1, int ni = -1, int nj = -1, int nk = -1, int uvi = -1, int uvj = -1, int uvk = -1, int group = -1) : vtxi(vtxi), vtxj(vtxj), vtxk(vtxk), uvi(uvi), uvj(uvj), uvk(uvk), ni(ni), nj(nj), nk(nk), group(group) {
         };
         int vtxi, vtxj, vtxk; // indices within the vertex coordinates array
         int uvi, uvj, uvk;  // indices within the uv coordinates array
@@ -418,7 +420,7 @@ public:
             }
         }
 
-        if (pivot_index<=starting_triangle || pivot_index>=ending_triangle-1 || ending_triangle-starting_triangle<15) return;
+        if (pivot_index<=starting_triangle || pivot_index>=ending_triangle-1 || ending_triangle-starting_triangle<STOP_NUM_TRG) return;
     
         node->child_left = new NodeBVH();
         node->child_right = new NodeBVH();
@@ -430,12 +432,11 @@ public:
     
     Intersection findIntersection (const Ray& ray) const override {
 
-        double distance;
-        if (!bounding_box_root->bbox.intersect(ray, distance)) return Intersection();
+        if (!bounding_box_root->bbox.intersect(ray)) return Intersection();
 
         std::list<NodeBVH*> nodes_to_visit;
         // TO FURTHER IMPROVE
-        // const NodeBVH* nodes_to_visit[20];
+        // const NodeBVH* nodes_to_visit[2* STOP_NUM_TRG];
         // l[0] = bounding_box_root;
         // int element_idx = 1;
         nodes_to_visit.push_front(bounding_box_root);
@@ -447,12 +448,11 @@ public:
         while (!nodes_to_visit.empty()){
             curNode = nodes_to_visit.back();
             nodes_to_visit.pop_back();
-            double inter_distance = 0;
             if (curNode->child_left){ //not a leaf: also implies curNode->child_right
-                if (curNode->child_left->bbox.intersect(ray, inter_distance)){
+                if (curNode->child_left->bbox.intersect(ray)){
                     nodes_to_visit.push_back(curNode->child_left);
                 }
-                if (curNode->child_right->bbox.intersect(ray, inter_distance)){
+                if (curNode->child_right->bbox.intersect(ray)){
                     nodes_to_visit.push_back(curNode->child_right);
                 }
             } else{

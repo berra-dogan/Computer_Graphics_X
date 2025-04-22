@@ -9,9 +9,6 @@ class Ray {
         
         explicit Ray(const Vector& O, const Vector& u)
             : O(O), u(u) {this->u.normalize();}
-    
-        const Vector& getOrigin() const { return O; }
-        void changeOrigin(const Vector& new_O) {}
 
         const Vector& getDirection() const { return u; }
     
