@@ -132,7 +132,7 @@ class Scene {
                             if (inShadow) {
                                 Lo = Lo + Vector(0., 0., 0.);
                             } else {
-                                Lo = Lo + (pointLight.I/(4*M_PI*d2)) * (obj->albedo/M_PI) * std::max(0., dot(N, lightDir));
+                                Lo = Lo + (pointLight.I/(4*M_PI*d2)) * (texture/M_PI) * std::max(0., dot(N, lightDir));
                             }
 
                         } else if ((*light_ptr).type==LightType::SPHERE){
@@ -160,7 +160,7 @@ class Scene {
 
                     if (includeIndirectLight){
                         Ray randomRay(P+EPSILON*N, random_cos(engine, N));
-                        Lo = Lo + obj->albedo * getColor(randomRay, engine, true, ray_depth - 1, obj_idx);
+                        Lo = Lo + texture * getColor(randomRay, engine, true, ray_depth - 1, obj_idx);
                     }
 
                     return Lo;

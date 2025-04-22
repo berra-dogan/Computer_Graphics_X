@@ -363,7 +363,7 @@ public:
         texturesH.push_back(H);
         std::vector<double> current_tex(W*H*3);
         for (int i = 0; i < W * H * 3; i++){
-            current_tex[i] = std::pow(tex[i],2.2); //SUPER UNSURE
+            current_tex[i] = std::pow(tex[i] / 255.0, 2.2); //SUPER UNSURE
         }
         textures.push_back(current_tex);
     }
@@ -504,13 +504,26 @@ public:
         
         if (best_inter_distance == std::numeric_limits<double>::max()) return Intersection(false);
 
-        // int U = std::max(0., std::min(UV[0] * texturesW[indices[i].group] - 1, )
+        int texWidth = texturesW[indices[closest_triangle_idx].group];
+        int texHeight = texturesH[indices[closest_triangle_idx].group];
+        
+        double u = std::clamp(UV[0], 0.0, 1.0);
+        double v = std::clamp(UV[1], 0.0, 1.0);
+
+        // Flip V to match image orientation
+        int U = std::min(int(u * texWidth), texWidth - 1);
+        int V = std::min(int((1.0 - v) * texHeight), texHeight - 1);
+
+        // int U = std::max(0., std::fmod(UV[0]* texturesW[indices[closest_triangle_idx].group] - 1, 1.));
+        // int V = std::max(0., std::fmod(UV[1]* texturesW[indices[closest_triangle_idx].group] - 1, 1.));
+        // int U = std::max(0., std::min(UV[0] * texturesW[indices[i].group], )
         // int V = std::max(0., std::min(UV[1] * texturesW[indices[i].group] - 1, ) 
         // int V = (1-UV[1]) * texturesW[indices[i].group]
-        // int texWidth = texturesW[indices[i].group].size()
-        // Vector texture = (textures[indices[i].group][(V*texWidth+U)*3+0], textures[indices[i].group][(V*texWidth+U)*3+1], textures[indices[i].group][(V*texWidth+U)*3+2]);
+        //int texWidth = texturesW[indices[closest_triangle_idx].group];
+        Vector texture(textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+0], textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+1], textures[indices[closest_triangle_idx].group][(V*texWidth+U)*3+2]);
 
-        Vector texture(1., 1., 1.);
+        // std::cout<< texture[2];
+        // Vector texture(0., 0., 0.);
         
        return Intersection(true, false, best_inter_distance, closest_P, closest_N, texture);
         

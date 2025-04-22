@@ -258,7 +258,7 @@ int example_mesh(){
 
     TriangleMesh catMesh(Vector(1.,1.,1.));
     catMesh.readOBJ("cadnav.com_model/Models_F0202A090/cat.obj");
-    catMesh.readOBJ("cadnav.com_model/Models_F0202A090/cat.obj");
+    catMesh.load_texture("cadnav.com_model/Models_F0202A090/cat_diff.png");
     catMesh.applyTransform(Vector(0.6, 0.6, 0.6), Vector(0, -10, 0));
     // catMesh.bounding_box = catMesh.compute_bbox();
 
