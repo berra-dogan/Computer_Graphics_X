@@ -17,15 +17,7 @@ Ray tracer implemented in C++. The project supports:
 * Run the command "make SRC=assignment1.cpp"
 * Run the command "./assignment1 image\_num" with the example from ./assignment1 that you would like to reconstruct
 
-## Project Structure
-
-CG_code_env/
-├── headers/              # Scene, Geometry, Light, Ray classes
-├── output_images/               # Saved rendered images
-├── assignment1.cpp       # Main file with exampleX() functions
-├── Makefile              # Build configuration
-└── README.md             # This file
-
+<pre><code>## Project Structure ```text CG_code_env/ ├── headers/ # Scene, Geometry, Light, Ray classes ├── output_images/ # Saved rendered images ├── assignment1.cpp # Main file with exampleX() functions ├── Makefile # Build configuration └── README.md # This file ``` </code></pre>
 
 ## Author
 
