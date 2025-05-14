@@ -13,9 +13,9 @@ public:
         double s = 0;
         for (int i = 0; i < vertices.size(); i++){ 
             int ip = (i==vertices.size()-1) ? 0 : (i+1);
-            s += std::abs(vertices[i][0]*vertices[ip][1]-vertices[ip][0]*vertices[i][1]);
+            s += vertices[i][0]*vertices[ip][1]-vertices[ip][0]*vertices[i][1];
         }
-        return s/2.;
+        return std::abs(s)/2.;
     }
 
     double integral_square_distance(const Vector& Pi){
