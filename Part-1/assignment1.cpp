@@ -105,7 +105,7 @@ int example2() {
     };
 
     Scene scene(objects, standard_scene_lights);
-    return example_struct(W, H, scene, "output_images/example2.png", true, nb_paths);
+    return example_struct(W, H, scene, "output_images/example2.png", true, nb_paths, 10);
 
 }
 

@@ -52,6 +52,8 @@
         "vector": "cpp",
         "algorithm": "cpp",
         "complex": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "C_Cpp.intelliSenseEngine": "Default",
+        "iostream": "cpp"
     }
 }

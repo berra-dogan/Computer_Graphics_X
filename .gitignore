@@ -1,0 +1,16 @@
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+
+# Ignore virtual environments
+venv/
+env/
+.venv/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore large files or folders
+Part-2/liblbfgs
+mesh.dSYM
+diffusion
