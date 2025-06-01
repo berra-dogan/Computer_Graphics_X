@@ -15,8 +15,30 @@ public:
         vor.points.resize(N);
         vor.weights.resize(N);
         for (int i = 0;  i<N; ++i){
-            vor.points[i] = Vector(uniform(engine), uniform(engine), 0);
+            vor.points[i] = Vector(uniform(engine), uniform(engine), 0.0);
+            vor.weights[i] = 0.0;
         }
+    }
+
+    double compute_cell_area_variance() {
+        int N = vor.diagram.size();
+        std::vector<double> areas(N);
+        double sum = 0.0;
+    
+        for (int i = 0; i < N; ++i) {
+            areas[i] = vor.diagram[i].area();
+            sum += areas[i];
+        }
+    
+        double mean = sum / N;
+        double variance = 0.0;
+    
+        for (int i = 0; i < N; ++i) {
+            double diff = areas[i] - mean;
+            variance += diff * diff;
+        }
+    
+        return variance / N;
     }
 
     static lbfgsfloatval_t evaluate(

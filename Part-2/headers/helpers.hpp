@@ -2,9 +2,9 @@
 #include "Polygon.hpp"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "../../Part-1/stb/stb_image_write.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../../Part-1/stb/stb_image.h"
 #include <sstream>
 
 // saves a static svg file. The polygon vertices are supposed to be in the range [0..1], and a canvas of size 1000x1000 is created

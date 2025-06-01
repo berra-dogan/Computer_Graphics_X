@@ -3,12 +3,13 @@
 #include "headers/Polygon.hpp"
 #include "headers/Voronoi.hpp"
 #include <iostream>
+#include "headers/helpers.hpp"
 
 int main() {
     std::default_random_engine engine(10);
     static std::uniform_real_distribution<double> uniform(0, 1);
 
-    int N = 100;
+    int N = 1000;
     VoronoiDiagram Vor;
     for (int i = 0; i <N; i++){
         Vor.points.push_back(Vector(uniform(engine), uniform(engine), 0.0));
