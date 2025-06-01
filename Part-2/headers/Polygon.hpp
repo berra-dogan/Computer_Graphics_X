@@ -18,8 +18,7 @@ class Polygon {
     
         double integral_square_distance(const Vector& Pi){
             if (vertices.size() < 3) {
-                std::cout << "Error: Polygon has fewer than 3 vertices.\n";
-                return 0.0; // or throw exception if preferred
+                return 0.0;
             }
             double s = 0;
             for (int t=0; t<vertices.size()-2; t++){
@@ -30,7 +29,9 @@ class Polygon {
                         integralT += dot(c[k]-Pi, c[l]-Pi);
                     }
                 }
-                double areaT = std::abs(((c[1][1]-c[0][1])*(c[2][0]-c[0][0]))-((c[1][0]-c[0][0])*(c[2][0]-c[1][1])));
+                Vector edge1 = c[1] - c[0];
+                Vector edge2 = c[2] - c[0];
+                double areaT = 0.5 * std::abs( edge1[0] * edge2[1] - edge1[1] * edge2[0] );
                 s += integralT * areaT / 6;
             }
             return s;
