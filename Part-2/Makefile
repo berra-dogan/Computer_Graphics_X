@@ -1,6 +1,6 @@
 # Makefile with required SRC, default OUT, printed INCLUDES, handling spaces in paths, and a debug option
 
-SRC = assignment2.cpp
+SRC = assignment2.cpp liblbfgs/lbfgs.cpp
 # Check if SRC is provided
 # ifeq ($(SRC),)
 #   $(error SRC is required. Please specify the source file, e.g., make SRC=trial.cpp)
@@ -25,7 +25,7 @@ PROJECT_DIR = "$(CURDIR)"
 INCLUDES ?= -I$(PROJECT_DIR)/liblbfgs/
 
 # Set OUT to be the basename of SRC (remove the file extension)
-OUT ?= $(basename $(SRC))
+OUT ?= assignment2
 
 CFLAGS += -I/opt/homebrew/opt/libomp/include -Xpreprocessor -fopenmp -stdlib=libc++
 LDFLAGS = -L/opt/homebrew/opt/libomp/lib -lomp -lc++ -Wall
