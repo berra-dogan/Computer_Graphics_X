@@ -83,7 +83,7 @@ void save_svg_animated(const std::vector<Polygon> &polygons, std::string filenam
     fclose(f);
 }
 
-void save_frame(const std::vector<Polygon> &cells, std::string filename, int frameid = 0) {
+void save_frame(const std::vector<Polygon> &cells, const std::vector<bool>& is_fluid, std::string filename, int frameid = 0) {
     int W = 1000, H = 1000;
     std::vector<unsigned char> image(W*H * 3, 255);
     #pragma omp parallel for schedule(dynamic)
@@ -127,18 +127,25 @@ void save_frame(const std::vector<Polygon> &cells, std::string filename, int fra
                     mindistEdge = std::min(mindistEdge, distEdge);
                 }
                 if (isInside) {
-                    //if (i < N) {   // the N first particles may represent fluid, displayed in blue
-                    //  image[((H - y - 1)*W + x) * 3] = 0;
-                    //  image[((H - y - 1)*W + x) * 3 + 1] = 0;
-                    //  image[((H - y - 1)*W + x) * 3 + 2] = 255;
-                    //}
+                    if (is_fluid[i]) {
+                        // Fill fluid cells in blue
+                        image[((H - y - 1)*W + x) * 3 + 0] = 0;   // Red
+                        image[((H - y - 1)*W + x) * 3 + 1] = 0;   // Green
+                        image[((H - y - 1)*W + x) * 3 + 2] = 255; // Blue
+                    } else {
+                        // Leave non-fluid cells white (or fully transparent if using RGBA later)
+                        image[((H - y - 1)*W + x) * 3 + 0] = 255;
+                        image[((H - y - 1)*W + x) * 3 + 1] = 255;
+                        image[((H - y - 1)*W + x) * 3 + 2] = 255;
+                    }
+                
+                    // Optional: draw cell borders in black
                     if (mindistEdge <= 2) {
-                        image[((H - y - 1)*W + x) * 3] = 0;
+                        image[((H - y - 1)*W + x) * 3 + 0] = 0;
                         image[((H - y - 1)*W + x) * 3 + 1] = 0;
                         image[((H - y - 1)*W + x) * 3 + 2] = 0;
                     }
-
-                }
+                }                
                 
             }
         }
