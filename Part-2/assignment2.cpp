@@ -30,8 +30,6 @@
 
 int main() {
 	int N = 100;
-    double fluid_ratio = 0.25;
-    double m_particle_ratio = 1.5;
     double dt = 0.002;
     double k = 0.004;
     double n_steps = 100;
@@ -39,6 +37,7 @@ int main() {
 
     Fluid fluid(N);
     fluid.run_simulation(k, dt, n_steps, m);
+    //fluid.time_step(k, dt, m);
 }
 
 

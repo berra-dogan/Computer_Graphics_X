@@ -14,21 +14,23 @@ class Fluid{
             }
         };
     
-        void time_step(double k, double dt, double m) {
+        void time_step(double eps, double dt, double m) {
             Vector g(0, -9.81, 0);
-
-            opt_trans.vor.points = particles;;
+            opt_trans.vor.points = particles;
             opt_trans.optimize();
         
             for (int i = 0; i < opt_trans.N; i++) {
                 Vector centerCell = opt_trans.vor.diagram[i].centroid();
+        
                 Vector F_g = m * g;
-                Vector F_spring = (centerCell - opt_trans.vor.points[i]) / (k * k);
+                Vector F_spring = (centerCell - particles[i]) / (eps*eps);
                 Vector F_total = F_spring + F_g;
-                velocities[i] = velocities[i] +(dt / m) * F_total;
-                opt_trans.vor.points[i] = opt_trans.vor.points[i] + dt * velocities[i];
+        
+                velocities[i] = velocities[i] + (dt / m) * F_total;
+                particles[i] =  particles[i] + dt * velocities[i];
             }
         }
+        
            
         void run_simulation(double k, double dt, int n_steps, double m) {
             std::cout << "Starting simulation with " << opt_trans.N << " particles..." << std::endl;
