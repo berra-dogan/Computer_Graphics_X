@@ -20,7 +20,7 @@ class Polygon {
                 c_y += (v1[1]+v2[1])*(v1[0]*v2[1]-v2[0]*v1[1]);
             }
 
-            return Vector(c_x/(6*A), c_y/(6*A), 0);
+            return Vector(-c_x/(6*A), -c_y/(6*A), 0);
         }
         
         double area() {

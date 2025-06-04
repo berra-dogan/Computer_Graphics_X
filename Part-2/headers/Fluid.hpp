@@ -44,8 +44,4 @@ class Fluid{
         OptimalTransport opt_trans;
         std::vector<Vector> particles;
         std::vector<Vector> velocities;
-        //std::vector<double> weights;
-        // std::vector<bool> is_fluid;
-        // std::vector<double> masses;
-        // double dt;
     };

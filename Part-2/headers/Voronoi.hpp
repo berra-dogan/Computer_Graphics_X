@@ -4,14 +4,13 @@
 class VoronoiDiagram {
     public:
         VoronoiDiagram() {
-            const int N_disk = 50;
-            disk.vertices.resize(N_disk);
-
-            for (int i=0; i<N_disk; i++){
-                double t = i/(double)N_disk * M_PI * 2;
-                disk.vertices[i][0] = cos(t);
-                disk.vertices[i][1] = sin(t);
-                disk.vertices[i][2] = 0;
+            int N_disk = 100;
+            disk.vertices.resize( N_disk );
+            for( int i = 0; i < N_disk; i++ ) {
+                double theta;
+                theta = i * 2 * M_PI / (double) N_disk;
+                disk.vertices[i] = Vector( sin( -theta ), cos( -theta ), 0 );
+                //unit_disk[i] = Vector( cos( -theta ), sin( -theta ), 0 );
             }
         }
     
