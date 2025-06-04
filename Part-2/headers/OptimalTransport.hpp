@@ -3,6 +3,8 @@
 #include "Voronoi.hpp"
 #include "../liblbfgs/lbfgs.h"
 
+#define FLUID_VOL_PCT 0.4
+
 std::default_random_engine engine(10);
 static std::uniform_real_distribution<double> uniform(0, 1);
 
@@ -56,8 +58,8 @@ public:
         lbfgsfloatval_t fx = 0.0;
         for (int i = 0; i < n; ++i) {
             double A = opt_trans->vor.diagram[i].area();
-            g[i] = -(1.0/n - A); //Negative gradient
-            fx += opt_trans->vor.diagram[i].integral_square_distance(opt_trans->vor.points[i]) - w[i]*(A-1.0/n);
+            g[i] = -(FLUID_VOL_PCT/n - A); //Negative gradient
+            fx += opt_trans->vor.diagram[i].integral_square_distance(opt_trans->vor.points[i]) - w[i]*(A-FLUID_VOL_PCT/n);
         }
 
         return -fx;
