@@ -34,11 +34,11 @@ class Fluid{
            
         void run_simulation(double k, double dt, int n_steps, double m) {
             std::cout << "Starting simulation with " << opt_trans.N << " particles..." << std::endl;
-            for (int i = 0; i <= 100; i++) {
+            for (int i = 0; i <= n_steps; i++) {
                 if (i % 10 == 0) {
-                    std::cout << "Processing frame " << i << " of 1000" << std::endl;
-                    save_frame(opt_trans.vor.diagram, "output/test", i);
+                    std::cout << "Processing frame " << i << " of " << n_steps << std::endl;
                 }
+                save_frame(opt_trans.vor.diagram, "output/test", i);
                 time_step(k, dt, m);
             }
         }

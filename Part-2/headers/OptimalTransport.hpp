@@ -3,7 +3,7 @@
 #include "Voronoi.hpp"
 #include "../liblbfgs/lbfgs.h"
 
-#define VOL_FLUID 0.6
+#define VOL_FLUID 0.4
 
 std::default_random_engine engine(10);
 static std::uniform_real_distribution<double> uniform(0, 1);
@@ -89,7 +89,8 @@ public:
         std::vector<double> weights( N_weights, 0 );
         
         memcpy( &weights[0], &vor.weights[0], N_weights * sizeof( weights[0] ) );
-        int ret = lbfgs( N_weights, &weights[0], &fx, evaluate, nullptr, ( void*)this, &param );
+        lbfgs( N_weights, &weights[0], &fx, evaluate, nullptr, ( void*)this, &param );
+        //int ret = lbfgs( N_weights, &weights[0], &fx, evaluate, nullptr, ( void*)this, &param );
         // if (ret < 0){
         //     std::cerr << "L-BFGS optimization failed: ret = " << ret << std::endl;
         //     return;

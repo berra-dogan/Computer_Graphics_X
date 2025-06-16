@@ -28,16 +28,27 @@
 
 // }
 
+#include <iostream>
+#include <chrono>  // Include this for timing
+
 int main() {
 	int N = 100;
     double dt = 0.002;
     double k = 0.004;
-    double n_steps = 100;
+    double n_steps = 175;
     double m = 200.;
 
     Fluid fluid(N);
-    fluid.run_simulation(k, dt, n_steps, m);
-    //fluid.time_step(k, dt, m);
-}
 
+    auto start = std::chrono::high_resolution_clock::now();
+
+    fluid.run_simulation(k, dt, n_steps, m);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+
+    std::cout << "Simulation took " << duration.count() << " seconds for " << n_steps <<" frames. \n";
+
+    return 0;
+}
 
