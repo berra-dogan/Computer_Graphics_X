@@ -6,9 +6,7 @@ class Fluid{
         Fluid(int N) : opt_trans(OptimalTransport(N)){
             velocities.resize( N, Vector( 0, 0, 0 ) );
             particles.resize(N);
-            // opt_trans.vor.weights.resize( N + 1 );
-            // std::fill(opt_trans.vor.weights.begin(), opt_trans.vor.weights.end(), 1.);
-
+            
             for (int i = 0; i < N; ++i) {
                 particles[i] = Vector(uniform(engine), uniform(engine), 0);
             }
@@ -38,7 +36,7 @@ class Fluid{
                 if (i % 10 == 0) {
                     std::cout << "Processing frame " << i << " of " << n_steps << std::endl;
                 }
-                save_frame(opt_trans.vor.diagram, "output/test", i);
+                save_frame(opt_trans.vor.diagram, "output/video_images/frame", i);
                 time_step(k, dt, m);
             }
         }
